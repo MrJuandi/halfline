@@ -46,7 +46,7 @@ function NavItem({ to, icon, label, collapsed, end }: { to: string; icon: ReactN
       title={collapsed ? label : undefined}
       className={({ isActive }) =>
         cx(
-          'group relative flex h-8 items-center gap-2.5 rounded-ctl px-2 text-label font-medium transition-[color,background-color,transform] duration-[120ms] active:scale-[0.98]',
+          'group relative flex h-10 items-center gap-3 rounded-ctl px-2.5 text-[15px] font-medium transition-[color,background-color,transform] duration-[120ms] active:scale-[0.98]',
           isActive ? 'text-fg' : 'text-muted hover:bg-surface-2 hover:text-fg',
         )
       }
@@ -60,10 +60,10 @@ function NavItem({ to, icon, label, collapsed, end }: { to: string; icon: ReactN
               className="absolute inset-0 rounded-ctl bg-surface-3"
               transition={{ type: 'spring', bounce: 0.12, duration: 0.38 }}
             >
-              <span className="absolute top-1.5 bottom-1.5 left-0 w-[2px] rounded-full bg-accent" />
+              <span className="absolute top-2 bottom-2 left-0 w-[2px] rounded-full bg-accent" />
             </motion.span>
           )}
-          <span className="relative grid size-4 shrink-0 place-items-center">{icon}</span>
+          <span className="relative grid size-5 shrink-0 place-items-center">{icon}</span>
           {!collapsed && <span className="relative truncate">{label}</span>}
         </>
       )}
@@ -78,24 +78,24 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
     <aside
       className={cx(
         'sticky top-0 hidden h-dvh shrink-0 flex-col border-r border-line bg-surface-1 transition-[width] duration-200 ease-[var(--ease-out)] md:flex',
-        collapsed ? 'w-14' : 'w-[232px]',
+        collapsed ? 'w-16' : 'w-[260px]',
       )}
     >
-      <div className={cx('flex h-12 items-center gap-2.5 border-b border-line', collapsed ? 'justify-center' : 'px-4')}>
+      <div className={cx('flex h-14 items-center gap-2.5 border-b border-line', collapsed ? 'justify-center' : 'px-5')}>
         <Link to="/" className="flex items-center gap-2.5" aria-label="Halfline, inicio">
-          <Logo />
-          {!collapsed && <span className="text-[15px] font-semibold tracking-[-0.01em]">Halfline</span>}
+          <Logo size={22} />
+          {!collapsed && <span className="text-[17px] font-semibold tracking-[-0.01em]">Halfline</span>}
         </Link>
       </div>
 
-      <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-2">
-        <NavItem to="/hoy" icon={<CalendarDays size={16} strokeWidth={1.6} />} label="Hoy" collapsed={collapsed} />
-        <NavItem to="/partidos" icon={<ListOrdered size={16} strokeWidth={1.6} />} label="Partidos" collapsed={collapsed} />
-        <NavItem to="/estilos" icon={<Orbit size={16} strokeWidth={1.6} />} label="Estilos" collapsed={collapsed} />
-        <NavItem to="/jugadores" icon={<UserRound size={16} strokeWidth={1.6} />} label="Jugadores" collapsed={collapsed} />
-        <NavItem to="/modelo" icon={<FlaskConical size={16} strokeWidth={1.6} />} label="Modelo" collapsed={collapsed} />
+      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
+        <NavItem to="/hoy" icon={<CalendarDays size={18} strokeWidth={1.6} />} label="Hoy" collapsed={collapsed} />
+        <NavItem to="/partidos" icon={<ListOrdered size={18} strokeWidth={1.6} />} label="Partidos" collapsed={collapsed} />
+        <NavItem to="/estilos" icon={<Orbit size={18} strokeWidth={1.6} />} label="Estilos" collapsed={collapsed} />
+        <NavItem to="/jugadores" icon={<UserRound size={18} strokeWidth={1.6} />} label="Jugadores" collapsed={collapsed} />
+        <NavItem to="/modelo" icon={<FlaskConical size={18} strokeWidth={1.6} />} label="Modelo" collapsed={collapsed} />
 
-        <div className={cx('mt-5 mb-1 px-2 text-caption text-subtle', collapsed && 'sr-only')}>Ligas</div>
+        <div className={cx('mt-6 mb-1.5 px-2.5 text-[13px] text-subtle', collapsed && 'sr-only')}>Ligas</div>
         {collapsed && <div className="mx-auto my-2 h-px w-6 bg-line" />}
         {LEAGUE_ORDER.map((code) => (
           <NavItem
@@ -103,9 +103,9 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
             to={`/ligas/${code}${season ? `?temporada=${season}` : ''}`}
             icon={
               collapsed ? (
-                <span className="text-[9px] font-semibold text-subtle">{LEAGUES[code].short}</span>
+                <span className="text-[11px] font-semibold text-subtle">{LEAGUES[code].short}</span>
               ) : (
-                <Trophy size={15} strokeWidth={1.6} className="text-subtle" />
+                <Trophy size={18} strokeWidth={1.6} className="text-subtle" />
               )
             }
             label={LEAGUES[code].name}
@@ -114,21 +114,21 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
         ))}
 
         <div className="mt-auto pt-4">
-          <NavItem to="/datos" icon={<Database size={16} strokeWidth={1.6} />} label="Datos" collapsed={collapsed} />
+          <NavItem to="/datos" icon={<Database size={18} strokeWidth={1.6} />} label="Datos" collapsed={collapsed} />
         </div>
       </nav>
 
-      <div className={cx('flex items-center border-t border-line p-2', collapsed ? 'justify-center' : 'justify-between')}>
+      <div className={cx('flex items-center border-t border-line p-3', collapsed ? 'justify-center' : 'justify-between')}>
         {!collapsed && meta && (
-          <span className="px-2 text-caption text-subtle">Datos hasta {date(meta.data_through)}</span>
+          <span className="px-2.5 text-[13px] text-subtle">Datos hasta {date(meta.data_through)}</span>
         )}
         <button
           onClick={onToggle}
-          className="grid size-7 place-items-center rounded-ctl text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
+          className="grid size-9 place-items-center rounded-ctl text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
           title="Plegar barra lateral ( [ )"
           aria-label="Plegar barra lateral"
         >
-          <PanelLeft size={15} strokeWidth={1.6} />
+          <PanelLeft size={18} strokeWidth={1.6} />
         </button>
       </div>
     </aside>
@@ -140,14 +140,14 @@ function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => 
 function Topbar({ crumbs, onSearch }: { crumbs: Crumb[]; onSearch: () => void }) {
   const [theme, toggle] = useTheme()
   return (
-    <header className="sticky top-0 z-20 flex h-12 items-center gap-3 border-b border-line bg-[color-mix(in_srgb,var(--bg)_88%,transparent)] px-4 backdrop-blur-md md:px-6">
+    <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-line bg-[color-mix(in_srgb,var(--bg)_88%,transparent)] px-4 backdrop-blur-md md:px-6">
       <Link to="/" className="md:hidden" aria-label="Inicio">
         <Logo />
       </Link>
-      <nav aria-label="Migas de pan" className="flex min-w-0 items-center gap-1.5 text-label">
+      <nav aria-label="Migas de pan" className="flex min-w-0 items-center gap-2 text-[15px]">
         {crumbs.map((c, i) => (
           <span key={i} className="flex min-w-0 items-center gap-1.5">
-            {i > 0 && <ChevronRight size={13} className="shrink-0 text-subtle" />}
+            {i > 0 && <ChevronRight size={15} className="shrink-0 text-subtle" />}
             {c.to && i < crumbs.length - 1 ? (
               <Link to={c.to} className="truncate text-muted transition-colors hover:text-fg">
                 {c.label}
@@ -161,10 +161,10 @@ function Topbar({ crumbs, onSearch }: { crumbs: Crumb[]; onSearch: () => void })
       <div className="ml-auto flex items-center gap-2">
         <button
           onClick={onSearch}
-          className="flex h-9 items-center gap-2 rounded-ctl bg-surface-1 pl-3 pr-1.5 text-label text-muted transition-[color,background-color,transform] hover:bg-surface-3 hover:text-fg active:scale-[0.98]"
+          className="flex h-10 items-center gap-2.5 rounded-ctl bg-surface-1 pl-3.5 pr-2 text-[15px] text-muted transition-[color,background-color,transform] hover:bg-surface-3 hover:text-fg active:scale-[0.98]"
         >
-          <Search size={14} strokeWidth={1.7} />
-          <span className="hidden w-40 text-left sm:block">Buscar equipo o partido</span>
+          <Search size={17} strokeWidth={1.7} />
+          <span className="hidden w-48 text-left sm:block">Buscar equipo o partido</span>
           <span className="hidden gap-0.5 sm:flex">
             <Kbd>⌘</Kbd>
             <Kbd>K</Kbd>
@@ -172,7 +172,7 @@ function Topbar({ crumbs, onSearch }: { crumbs: Crumb[]; onSearch: () => void })
         </button>
         <button
           onClick={(e) => toggle(e)}
-          className="grid size-8 place-items-center rounded-ctl text-subtle transition-[color,background-color,transform] hover:bg-surface-2 hover:text-fg active:scale-90"
+          className="grid size-10 place-items-center rounded-ctl text-subtle transition-[color,background-color,transform] hover:bg-surface-2 hover:text-fg active:scale-90"
           aria-label={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
           title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
         >
@@ -185,7 +185,7 @@ function Topbar({ crumbs, onSearch }: { crumbs: Crumb[]; onSearch: () => void })
               transition={{ duration: 0.15 }}
               className="grid place-items-center"
             >
-              {theme === 'dark' ? <Sun size={15} strokeWidth={1.6} /> : <Moon size={15} strokeWidth={1.6} />}
+              {theme === 'dark' ? <Sun size={18} strokeWidth={1.6} /> : <Moon size={18} strokeWidth={1.6} />}
             </motion.span>
           </AnimatePresence>
         </button>

@@ -156,7 +156,7 @@ export function Delta({ value, threshold = 0.03 }: { value: number; threshold?: 
 
 export function Kbd({ children }: { children: ReactNode }) {
   return (
-    <kbd className="inline-grid h-[18px] min-w-[18px] place-items-center rounded-[4px] border border-line bg-surface-2 px-1 font-sans text-[11px] font-medium text-muted">
+    <kbd className="inline-grid h-5 min-w-5 place-items-center rounded-[4px] border border-line bg-surface-2 px-1 font-sans text-[12px] font-medium text-muted">
       {children}
     </kbd>
   )
@@ -262,7 +262,7 @@ export function Tabs<T extends string>({
   id: string
 }) {
   return (
-    <div role="tablist" className="flex gap-1 border-b border-line">
+    <div role="tablist" data-ui className="flex gap-1 border-b border-line" /* taste-skill-ignore: pestañas subrayadas de la app */>
       {tabs.map((t) => {
         const active = t.value === value
         return (
@@ -323,10 +323,10 @@ export function Select<T extends string | number>({
   )
 }
 
-/** Cifra destacada: etiqueta pequeña, número grande, nota debajo. */
+/** Cifra destacada sin caja: etiqueta pequeña, número grande, nota debajo. Se separa por espacio, no por superficie. */
 export function Stat({ label, value, sub, tone }: { label: ReactNode; value: ReactNode; sub?: ReactNode; tone?: 'pos' | 'neg' | 'accent' }) {
   return (
-    <div className="min-w-0 rounded-panel bg-surface-1 px-5 py-4">
+    <div className="min-w-0 py-1">
       <div className="text-label text-muted">{label}</div>
       <div
         className={cx(

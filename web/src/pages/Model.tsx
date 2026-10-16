@@ -109,7 +109,7 @@ export default function Model() {
       ) : (
         <Stagger className="flex flex-col gap-6">
           <StaggerItem>
-            <Panel className="grid gap-8 p-6 md:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:items-center">
+            <section className="grid gap-8 py-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:items-center">
               <div>
                 <h2 className="text-[34px] leading-[38px] font-semibold tracking-[-0.035em] md:text-[44px] md:leading-[48px]">
                   El mercado sigue por delante.
@@ -124,22 +124,22 @@ export default function Model() {
                   { label: e.model, v: total.model.logloss, tone: 'text-fg' },
                   { label: 'Frecuencias', v: e.ranking.find((r) => r.model === 'Frecuencias')?.logloss ?? null, tone: 'text-muted' },
                 ].map((t) => (
-                  <div key={t.label} className="rounded-[12px] bg-surface-2 px-4 py-4">
+                  <div key={t.label} className="min-w-0">
                     <div className={cx('num text-[30px] leading-9 font-semibold tracking-[-0.03em]', t.tone)}>{num(t.v, 3)}</div>
                     <div className="mt-1 truncate text-label text-muted">{t.label}</div>
                   </div>
                 ))}
                 <p className="col-span-3 text-caption text-muted">Log-loss medio por partido: menos es mejor.</p>
               </div>
-            </Panel>
+            </section>
           </StaggerItem>
 
-          <StaggerItem className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+          <StaggerItem className="grid grid-cols-1 gap-8 py-2 lg:grid-cols-3">
             {METRICS.map((m) => {
               const a = total.model[m.k]
               const b = total.market[m.k]
               return (
-                <Panel key={m.k} className="px-5 py-4">
+                <section key={m.k}>
                   <div className="text-label font-medium">{m.label}</div>
                   <div className="mt-3 flex items-baseline gap-6">
                     <div>
@@ -154,7 +154,7 @@ export default function Model() {
                   <p className="mt-3 text-caption text-muted">
                     {a > b ? `El mercado gana por ${num(a - b, 3)}.` : `El modelo gana por ${num(b - a, 3)}.`} {m.hint} Menor es mejor.
                   </p>
-                </Panel>
+                </section>
               )
             })}
           </StaggerItem>

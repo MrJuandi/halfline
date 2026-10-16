@@ -21,12 +21,12 @@ function Headlines({ rows, league, season }: { rows: TableRow[]; league: string;
     { label: 'Mejor ataque por xG', team: attack, value: num(attack.xg_for / Math.max(attack.played, 1)), sub: 'xG por partido', tone: '' },
   ]
   return (
-    <div className="mb-6 grid grid-cols-2 gap-3 xl:grid-cols-4">
+    <div className="-mx-4 mb-6 grid grid-cols-2 gap-y-2 xl:grid-cols-4">
       {tiles.map((t) => (
         <Link
           key={t.label}
           to={`/equipos/${league}/${encodeURIComponent(t.team.team)}?temporada=${season}`}
-          className="group flex flex-col rounded-panel bg-surface-1 px-4 py-4 sm:px-5 transition-[background-color,transform] hover:bg-surface-2 active:scale-[0.99]"
+          className="group flex min-w-0 flex-col rounded-panel px-4 py-4 transition-[background-color,transform] hover:bg-surface-1 active:scale-[0.99]"
         >
           <span className="line-clamp-1 text-label text-muted">{t.label}</span>
           <span className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">

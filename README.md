@@ -1,56 +1,112 @@
 <p align="center">
-  <img src="web/public/favicon.svg" width="64" alt="Halfline">
+  <img src="web/public/favicon.svg" width="56" alt="Halfline">
 </p>
 
 <h1 align="center">Halfline</h1>
 
-<p align="center"><b>Quita el margen. Mira el partido.</b><br>
-Probabilidades 1X2 de fútbol con machine learning, comparadas con las casas de apuestas y Polymarket.</p>
+<p align="center">
+  Probabilidades 1X2 para las cinco grandes ligas europeas, comparadas con las casas de apuestas y Polymarket.
+</p>
+
+<p align="center">
+  <img alt="Python" src="https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white">
+  <img alt="React" src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black">
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-pytest-0A9EDC?logo=pytest&logoColor=white">
+</p>
 
 ---
 
-Trabajo de Fin de Grado. Halfline estima, antes de cada partido de las cinco grandes ligas europeas, la probabilidad de **victoria local, empate y victoria visitante**. Después le quita a las cuotas el margen que cobran las casas y compara lo que queda con un modelo propio y con Polymarket.
+Halfline calcula antes de cada partido la probabilidad de victoria local, empate y victoria visitante. Quita el margen de las cuotas para sacar la probabilidad implícita del mercado y la compara con modelos propios: Elo ajustado por xG, Dixon-Coles y metamodelos. Todo se evalúa fuera de muestra.
 
-El nombre viene de la *halfway line*, la línea de medio campo. Es el punto justo entre local y visitante, y también la *line* de las apuestas.
+## Funcionalidades
 
-## Qué hay dentro
+- **Jornada:** próximos partidos con la probabilidad del modelo frente a la del mercado sin margen.
+- **Ficha de partido:** mapa de tiros con xG, carrera de xG, momentum, alineaciones, mapas de calor y estadísticas avanzadas.
+- **Ligas y equipos:** clasificación con goles esperados (xG) y puntos esperados (xPts), forma reciente, Elo y rendimiento subyacente.
+- **Jugadores y estilos:** perfiles por rol con percentiles por 90 minutos, jugadores similares y mapa de estilos de juego.
+- **Evaluación del modelo:** log-loss, Brier y RPS por liga, calibración y retorno simulado con intervalos de confianza.
+- **Mercados:** margen de cada casa, sesgos del mercado y comparación con Polymarket.
 
-| Carpeta | Contenido |
+## Resultados
+
+Test fuera de muestra: temporadas 2025/26 y 2026/27, 2.049 partidos. Menos es mejor.
+
+| Modelo | Log-loss |
 |---|---|
-| `futdata/` | Descarga y limpieza de datos (Football-Data, Understat, ESPN, Transfermarkt, Polymarket), variables, modelos y la API Flask |
-| `futdata/models/` | Elo, Poisson y goles, quitar el margen, sesgos del mercado, evaluación y comparación con Polymarket |
-| `web/` | Aplicación React + TypeScript + Vite |
-| `docs/` | Notas de datos, modelos, sesgos del mercado y diseño |
-| `tests/` | Tests con pytest |
+| Mercado de cierre (sin margen) | 0,975 |
+| Mercado pre-cierre (sin margen) | 0,976 |
+| Elo ajustado por xG | 0,993 |
+| Frecuencias históricas | 1,071 |
 
-## Pipeline
+El detalle está en [`docs/modelos.md`](docs/modelos.md) y [`docs/sesgos_mercado.md`](docs/sesgos_mercado.md).
+
+## Arquitectura
 
 ```
-Datos → Limpieza → Variables → Modelo → Quitar margen → Evaluación → App
+futdata/             Ingesta, limpieza, variables, modelos y API
+├── football_data    Resultados y cuotas de cierre
+├── espn             Estadísticas, alineaciones y calendario
+├── understat        xG por partido
+├── pitchapi         Tiros con coordenadas, momentum y mapas de calor
+├── transfermarkt    Valores de mercado de las plantillas
+├── polymarket       Precios del mercado de predicción
+├── features         Variables previas al partido, sin fuga de información
+├── models/          Elo, goles, eliminación de margen, evaluación y sesgos
+└── api              API Flask de solo lectura
+web/                 Frontend en React + TypeScript + Vite
+tests/               Tests con pytest
+docs/                Notas técnicas de datos, modelos y diseño
 ```
 
-## Arrancar en local
+## Puesta en marcha
+
+Requisitos: Python 3.12 o superior y Node 22 o superior.
 
 ```bash
 pip install -r requirements.txt
 npm install --prefix web
-./scripts/dev.sh        # API en :8000 y web en http://localhost:5173
 ```
 
-Los datos (`data/`) no están en el repositorio por su tamaño. Se regeneran con `python -m futdata download`. La clave de PitchAPI va en `.env` como `PITCHAPI_KEY`.
+Datos (no se versionan):
 
-## Identidad
+```bash
+python -m futdata download          # fuentes crudas: football_data, espn, understat, transfermarkt, pitchapi
+python -m futdata.polymarket        # precios de Polymarket
+python -m futdata.features          # tabla de variables
+python -m futdata.models.evaluate   # entrenamiento y evaluación
+```
 
-| Rol | Oscuro | Claro |
-|---|---|---|
-| Fondo | `#0c0d0f` | `#f3f3f1` |
-| Acento (ventaja, modelo) | `#4cc38a` | `#18794e` |
-| Local | `#5b9bf0` | `#2563c9` |
-| Empate | `#8e9096` | `#7a7c83` |
-| Visitante | `#e5a54b` | `#b7741a` |
+PitchAPI necesita una clave en `.env`:
 
-Tipografía: Geist. Logo: círculo central cortado por la línea de medio campo.
+```bash
+PITCHAPI_KEY=tu_clave
+```
 
-## Tecnologías
+Desarrollo:
 
-Python · pandas · numpy · scikit-learn · scipy · Flask · React · TypeScript · Vite · Tailwind · d3
+```bash
+./scripts/dev.sh                    # API en :8000 y web en http://localhost:5173
+```
+
+Tests:
+
+```bash
+python -m pytest
+```
+
+## API
+
+| Endpoint | Descripción |
+|---|---|
+| `GET /api/meta` | Cobertura y fecha de los datos |
+| `GET /api/upcoming?days=` | Próximos partidos con probabilidades |
+| `GET /api/matches?league=&season=&team=&limit=` | Partidos jugados |
+| `GET /api/matches/<match_id>` | Ficha completa de un partido |
+| `GET /api/leagues/<league>/table?season=` | Clasificación con xG y xPts |
+| `GET /api/teams/<league>/<team>?season=` | Página de equipo |
+| `GET /api/teams` | Equipos disponibles |
+
+## Stack
+
+Python · pandas · NumPy · SciPy · scikit-learn · Flask · React · TypeScript · Vite · Tailwind CSS · d3 · Motion

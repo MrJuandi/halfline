@@ -18,7 +18,7 @@ import {
   TeamBadge,
   TeamLink,
 } from '../components/ui'
-import { api, teamColor, useApi, type MatchDetail, type Probs, type Side, teamName as tn } from '../lib/api'
+import { api, useApi, type MatchDetail, type Probs, type Side, teamName as tn } from '../lib/api'
 import { exampleModel } from '../lib/example'
 import { date, day, LEAGUES, num, pct, pp, seasonLabel, time } from '../lib/format'
 
@@ -55,13 +55,8 @@ function Scoreboard({ d }: { d: MatchDetail }) {
     )
   }
   return (
-    <div className="mb-6 overflow-hidden rounded-panel bg-surface-1">
-      {/* Franja con los colores de cada equipo */}
-      <div className="flex h-1.5">
-        <span className="flex-1" style={{ background: teamColor(m.home) ?? 'var(--home)' }} />
-        <span className="flex-1" style={{ background: teamColor(m.away) ?? 'var(--away)' }} />
-      </div>
-      <div className="px-5 pt-6 pb-7 md:px-10">
+    <div className="mb-6">
+      <div className="px-5 pt-4 pb-7 md:px-10">
         <div className="mb-7 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-label text-muted">
           <Link to={`/ligas/${m.league}?temporada=${m.season}`} className="transition-colors hover:text-fg">
             {LEAGUES[m.league].name} {seasonLabel(m.season)}

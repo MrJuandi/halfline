@@ -194,7 +194,7 @@ export function StageFragment({ d, stage }: { d: MatchDetail; stage: number }) {
                 <div key={k} className="grid grid-cols-[110px_1fr_64px] items-center gap-3">
                   <span className="truncate">{labelOf(d, k)}</span>
                   <div className="relative h-5">
-                    <div className="absolute inset-x-0 top-1/2 h-px bg-line-strong" />
+                    <div className="absolute inset-x-0 top-1/2 h-px bg-line-strong" /* taste-skill-ignore: eje del gráfico */ />
                     <div className="absolute top-1/2 size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-subtle bg-surface-1" style={{ left: `${fair[k] * 100}%` }} />
                     {model && (
                       <motion.div
@@ -293,7 +293,7 @@ export function MarginHistogram({ m }: { m: Markets }) {
             {s.label} <span className="tnum font-semibold">{pct(1 + s.mean, 1)}</span>
           </span>
         ))}
-        <span className="text-muted">100 % = sin comisión</span>
+        <span className="text-muted">100 % = sin margen en el precio</span>
       </div>
       <figcaption className="sr-only">Distribución de la suma de las tres probabilidades implícitas antes del partido.</figcaption>
     </figure>

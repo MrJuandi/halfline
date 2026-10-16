@@ -60,7 +60,7 @@ function Button({ to, children, tone = 'solid' }: { to: string; children: ReactN
 }
 
 const H2 = 'text-[clamp(34px,4.4vw,64px)] leading-[1.02] font-semibold tracking-[-0.035em]'
-const LEAD = 'text-[18px] leading-[1.55] md:text-[20px]'
+const LEAD = 'text-[20px] leading-[1.55]'
 
 /* ---------------------------------------------------------------- datos de la portada */
 
@@ -82,13 +82,13 @@ function TopNav() {
         <Link to="/" className="flex items-center gap-2.5 text-[16px] font-semibold tracking-[-0.01em]">
           <Logo size={20} /> Halfline
         </Link>
-        <nav className="hidden items-center gap-7 text-[15px] text-muted md:flex">
+        <nav className="hidden items-center gap-7 text-[16px] text-muted md:flex">
           <a href="#como" className="transition-colors hover:text-fg">Cómo funciona</a>
           <a href="#mercados" className="transition-colors hover:text-fg">Mercados</a>
           <a href="#partido" className="transition-colors hover:text-fg">El partido</a>
           <a href="#fuentes" className="transition-colors hover:text-fg">Datos</a>
         </nav>
-        <Link to="/hoy" className="ml-auto inline-flex h-10 items-center gap-1.5 rounded-[8px] bg-fg px-4 text-[15px] font-medium text-bg transition-transform duration-150 active:scale-[0.97]">
+        <Link to="/hoy" className="ml-auto inline-flex h-10 items-center gap-1.5 rounded-[8px] bg-fg px-4 text-[16px] font-medium text-bg transition-transform duration-150 active:scale-[0.97]">
           Abrir la app <ArrowRight size={15} />
         </Link>
       </div>
@@ -181,7 +181,7 @@ function HowItWorks({ d }: { d: MatchDetail | undefined }) {
               </motion.span>
             </h2>
           </Rise>
-          <Rise i={1} className="mt-10 max-w-[42ch] text-[18px] leading-[1.6]">
+          <Rise i={1} className={cx(LEAD, 'mt-10 max-w-[42ch]')}>
             {stage === 0 && 'Una cuota de 2,00 parece un 50 %. Pero si sumas las tres del partido pasan del 100 %: el exceso es lo que la casa gana pase lo que pase.'}
             {stage === 1 && 'Se reparten las tres probabilidades para que sumen exactamente 100 %. Es la mejor estimación del mercado sin su comisión.'}
             {stage === 2 && 'El modelo propio solo ve partidos anteriores: Elo ajustado por xG, forma y descanso. Donde se separa del mercado, hay algo que mirar.'}
@@ -232,14 +232,14 @@ function PredictionMarkets() {
       <div className={cx(WRAP, 'grid gap-14 lg:grid-cols-[5fr_7fr] lg:gap-20')}>
         <div>
           <Rise>
-            <h2 className={H2}>Polymarket no cobra margen.</h2>
+            <h2 className={H2}>Polymarket cobra menos.</h2>
           </Rise>
           <Rise i={1} className={cx(LEAD, 'mt-8 max-w-[38ch]')}>
             {m
-              ? `En los mismos ${int(m.n)} partidos, las probabilidades de las casas suman de media un ${pct(1 + m.books.mean, 1)}. Las de Polymarket, un ${pct(1 + m.polymarket.mean, 1)}.`
-              : 'En los mismos partidos, las casas cobran su margen y el mercado de predicción casi nada.'}
+              ? `En los mismos ${int(m.n)} partidos, las probabilidades de las casas suman de media un ${pct(1 + m.books.mean, 1)}. Las de Polymarket, un ${pct(1 + m.polymarket.mean, 1)}: su comisión no va dentro del precio, se paga aparte al comprar.`
+              : 'Las casas meten su margen dentro de la cuota. Polymarket cobra una comisión aparte al comprar, y es menor.'}
           </Rise>
-          <Rise i={2} className="mt-6 max-w-[42ch] text-[17px] leading-[1.6] text-muted">
+          <Rise i={2} className="mt-6 max-w-[42ch] text-[16px] leading-[1.6] text-muted">
             Y aciertan lo mismo. Ningún modelo propio les gana todavía: lo decimos porque es lo que dicen los datos, y porque saberlo es el punto de partida.
           </Rise>
         </div>
@@ -279,7 +279,7 @@ function LeagueRows() {
               <FormSquares form={r.form.slice(-3)} size={12} />
             </span>
             <span className="relative h-2">
-              <span className="absolute inset-y-[-3px] left-1/2 w-px bg-line-strong" />
+              <span className="absolute inset-y-[-3px] left-1/2 w-px bg-line-strong" /* taste-skill-ignore: eje del gráfico */ />
               <span className="absolute inset-y-0 rounded-[2px]" style={{ background: d >= 0 ? 'var(--pos)' : 'var(--neg)', [d >= 0 ? 'left' : 'right']: '50%', width: `${(Math.abs(d) / max) * 50}%` }} />
             </span>
             <span className={cx('tnum text-right', d >= 0 ? 'text-pos' : 'text-neg')}>{signed(d, 1)}</span>
@@ -300,7 +300,7 @@ function ModelRows({ d }: { d: MatchDetail }) {
         <div key={k} className="grid grid-cols-[96px_1fr_52px] items-center gap-3">
           <span className="truncate">{k === 'home' ? tn(d.match.home) : k === 'away' ? tn(d.match.away) : 'Empate'}</span>
           <div className="relative h-5">
-            <div className="absolute inset-x-0 top-1/2 h-px bg-line-strong" />
+            <div className="absolute inset-x-0 top-1/2 h-px bg-line-strong" /* taste-skill-ignore: eje del gráfico */ />
             <div className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-subtle" style={{ left: `${fair[k] * 100}%` }} />
             <div className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ left: `${model[k] * 100}%`, background: `var(--${k})` }} />
           </div>
@@ -312,7 +312,6 @@ function ModelRows({ d }: { d: MatchDetail }) {
 }
 
 function Showcase({ d }: { d: MatchDetail | undefined }) {
-  const row = useRef<HTMLDivElement>(null)
   const [active, setActive] = useState(0)
   const panels = useMemo(() => {
     if (!d) return []
@@ -327,87 +326,76 @@ function Showcase({ d }: { d: MatchDetail | undefined }) {
     ]
   }, [d])
 
-  const go = (i: number) => {
-    const el = row.current?.children[i] as HTMLElement | undefined
-    el?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
-  }
-  useEffect(() => {
-    const el = row.current
-    if (!el) return
-    const onScroll = () => {
-      const mid = el.scrollLeft + el.clientWidth / 2
-      let best = 0
-      let dist = Infinity
-      Array.from(el.children).forEach((c, i) => {
-        const h = c as HTMLElement
-        const dd = Math.abs(h.offsetLeft + h.offsetWidth / 2 - mid)
-        if (dd < dist) {
-          dist = dd
-          best = i
-        }
-      })
-      setActive(best)
-    }
-    el.addEventListener('scroll', onScroll, { passive: true })
-    return () => el.removeEventListener('scroll', onScroll)
-  }, [panels.length])
-
+  const go = (i: number) => setActive(Math.max(0, Math.min(panels.length - 1, i)))
   const p = panels[active]
   return (
-    <section id="partido" className="scroll-mt-0 bg-surface-1 py-28 md:py-40">
-      <div className={cx(WRAP, PAD, 'mb-12 grid gap-6 md:grid-cols-[5fr_7fr] md:items-end')}>
+    <section id="partido" className={cx('scroll-mt-0 bg-surface-1 py-28 md:py-40', PAD)}>
+      <div className={cx(WRAP, 'mb-12 grid gap-6 md:grid-cols-[7fr_5fr] md:items-end')}>
         <Rise>
           <h2 className={H2}>Cada partido, entero.</h2>
         </Rise>
         <Rise i={1} className={cx(LEAD, 'max-w-[40ch] text-muted')}>
-          {d ? `${tn(d.match.home)} ${d.match.home_goals}–${d.match.away_goals} ${tn(d.match.away)}, tal como sale en la app.` : 'Un partido real, tal como sale en la app.'} Desliza.
+          {d ? `${tn(d.match.home)} ${d.match.home_goals}–${d.match.away_goals} ${tn(d.match.away)}, tal como sale en la app.` : 'Un partido real, tal como sale en la app.'}
         </Rise>
       </div>
-      <div
-        ref={row}
-        className="no-scrollbar flex snap-x snap-mandatory gap-[6vw] overflow-x-auto px-[calc(50%-min(43vw,230px))] py-6"
-        tabIndex={0}
-        aria-label="Piezas de la ficha de un partido"
-      >
-        {panels.length
-          ? panels.map((pn, i) => (
-              <div
-                key={pn.name}
-                data-ui
-                onClick={() => go(i)}
-                className={cx(
-                  'w-[min(86vw,460px)] shrink-0 snap-center rounded-[14px] bg-bg p-5 text-[13px] transition-[opacity,transform] duration-500 ease-[var(--ease-out)]',
-                  i === active ? 'theme-light scale-100 opacity-100' : 'theme-dark scale-[0.94] opacity-40',
-                )}
-                aria-hidden={i !== active}
-              >
-                <div className="mb-3 text-[14px] font-medium">{pn.name}</div>
-                {pn.body}
-              </div>
-            ))
-          : [0, 1, 2].map((i) => <div key={i} className="skeleton h-80 w-[min(86vw,460px)] shrink-0 rounded-[14px]" />)}
-      </div>
-      <div className={cx(WRAP, PAD, 'mt-8 flex items-start justify-between gap-6')}>
-        <div className="max-w-[44ch]" aria-live="polite">
-          <p className="text-[24px] leading-tight font-medium tracking-[-0.01em]">{p?.name}</p>
-          <p className="mt-2 text-[16px] leading-[1.55] text-muted">{p?.text}</p>
+      <div className={cx(WRAP, 'grid gap-10 md:grid-cols-[7fr_5fr] md:items-center md:gap-16')}>
+        {/* Una pieza cada vez, sobre el fondo de la sección: se cambia con la lista, las flechas o arrastrando */}
+        <div className="flex min-h-[260px] items-center md:min-h-[460px]">
+          {p ? (
+            <motion.div
+              key={p.name}
+              data-ui
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.18}
+              onDragEnd={(_, info) => {
+                if (info.offset.x < -60) go(active + 1)
+                else if (info.offset.x > 60) go(active - 1)
+              }}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, ease }}
+              className="w-full cursor-grab touch-pan-y text-[14px] active:cursor-grabbing"
+              aria-label={`Pieza de la ficha: ${p.name}`}
+            >
+              {p.body}
+            </motion.div>
+          ) : (
+            <div className="skeleton h-80 w-full rounded-[14px]" />
+          )}
         </div>
-        <div className="flex shrink-0 gap-2">
-          {[
-            { icon: <ArrowLeft size={18} />, to: Math.max(0, active - 1), label: 'Anterior' },
-            { icon: <ArrowRight size={18} />, to: Math.min(panels.length - 1, active + 1), label: 'Siguiente' },
-          ].map((b) => (
-            <button key={b.label} onClick={() => go(b.to)} aria-label={b.label} className="grid size-12 place-items-center rounded-[8px] bg-surface-3 text-fg transition-transform duration-150 hover:bg-[color-mix(in_srgb,var(--surface-3)_70%,var(--text))] active:scale-95">
-              {b.icon}
-            </button>
-          ))}
+        <div>
+          <ul className="space-y-1" aria-label="Piezas de la ficha de un partido">
+            {panels.map((pn, i) => (
+              <li key={pn.name}>
+                <button
+                  onClick={() => go(i)}
+                  aria-current={i === active}
+                  className="group block w-full py-3 text-left"
+                >
+                  <span className={cx('block text-[24px] leading-tight font-medium tracking-[-0.01em] transition-colors duration-150', i === active ? 'text-fg' : 'text-subtle group-hover:text-fg')}>{pn.name}</span>
+                  {i === active && <span className="mt-1 block text-[16px] leading-[1.55] text-muted">{pn.text}</span>}
+                </button>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-6 flex gap-2">
+            {[
+              { icon: <ArrowLeft size={18} />, to: active - 1, label: 'Anterior' },
+              { icon: <ArrowRight size={18} />, to: active + 1, label: 'Siguiente' },
+            ].map((b) => (
+              <button key={b.label} onClick={() => go(b.to)} aria-label={b.label} className="grid size-12 place-items-center rounded-[8px] bg-surface-3 text-fg transition-transform duration-150 hover:bg-[color-mix(in_srgb,var(--surface-3)_70%,var(--text))] active:scale-95">
+                {b.icon}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </section>
   )
 }
 
-/* ---------------------------------------------------------------- notas al margen */
+/* ---------------------------------------------------------------- cómo se lee una ficha */
 
 function MarginNotes({ d }: { d: MatchDetail | undefined }) {
   const [focus, setFocus] = useState<NoteKey | null>(null)
@@ -420,8 +408,8 @@ function MarginNotes({ d }: { d: MatchDetail | undefined }) {
         onBlur={() => setFocus(null)}
         className={cx('block w-full max-w-[26ch] rounded-[6px] text-left transition-colors', n.side === 'l' ? 'lg:ml-auto lg:text-right' : '')}
       >
-        <span className={cx('block text-[18px] font-medium transition-colors', focus === n.key ? 'text-accent' : 'text-fg')}>{n.title}</span>
-        <span className="mt-1 block text-[15px] leading-[1.5] text-muted">{n.text}</span>
+        <span className={cx('block text-[20px] font-medium transition-colors', focus === n.key ? 'text-accent' : 'text-fg')}>{n.title}</span>
+        <span className="mt-1 block text-[16px] leading-[1.5] text-muted">{n.text}</span>
       </button>
     </Rise>
   )
@@ -430,7 +418,7 @@ function MarginNotes({ d }: { d: MatchDetail | undefined }) {
     <section className={cx('bg-bg py-28 md:py-44', PAD)}>
       <div className={WRAP}>
         <Rise className="mb-14 lg:mb-20">
-          <h2 className={cx(H2, 'max-w-[14ch]')}>Notas al margen.</h2>
+          <h2 className={cx(H2, 'max-w-[14ch]')}>Cómo se lee una ficha.</h2>
         </Rise>
         {/* Escritorio: notas alineadas con la parte de la ficha que explican */}
         <div className="hidden grid-cols-[1fr_400px_1fr] gap-12 lg:grid">
@@ -475,13 +463,13 @@ function Sources({ meta }: { meta: Meta | undefined }) {
     <section id="fuentes" className={cx('scroll-mt-0 bg-surface-1 py-28 md:py-40', PAD)}>
       <div className={cx(WRAP, 'grid grid-cols-2 gap-1.5 md:grid-cols-4 md:gap-2')}>
         <Rise className="col-span-2 flex min-h-[160px] flex-col justify-between rounded-[12px] bg-accent p-6 text-[#0c0d0f] md:min-h-[230px] md:p-8">
-          <h2 className="text-[clamp(30px,3vw,46px)] leading-[1.02] font-semibold tracking-[-0.03em]">Cinco fuentes, un partido.</h2>
+          <h2 className={H2}>Cinco fuentes, un partido.</h2>
           <p className="max-w-[40ch] text-[16px] leading-[1.5]">Unidas partido a partido. Las variables solo usan partidos anteriores al que se predice, y hay tests que lo comprueban.</p>
         </Rise>
         {tiles.map((t, i) => (
-          <Rise key={t.small} i={(i % 4) + 1} y={16} className="flex min-h-[150px] flex-col justify-between rounded-[12px] bg-surface-2 p-5 md:min-h-[230px] md:p-6">
+          <Rise key={t.small} i={(i % 4) + 1} y={16} className="flex min-h-[150px] flex-col justify-end gap-2 rounded-[12px] bg-surface-2 p-5 md:min-h-[230px] md:p-6">
             <span className="text-[clamp(20px,2.2vw,32px)] leading-[1.05] font-semibold tracking-[-0.02em] tnum">{t.big}</span>
-            <span className="text-[14px] leading-[1.45] text-muted md:text-[15px]">{t.small}</span>
+            <span className="text-[16px] leading-[1.45] text-muted">{t.small}</span>
           </Rise>
         ))}
       </div>
@@ -499,8 +487,8 @@ function Closing() {
           <img src={estadioNoche} alt="Grada llena bajo los focos en un estadio de noche" loading="lazy" width={1200} height={1600} className="size-full object-cover" />
         </Rise>
         <Rise i={1} className="order-1 col-span-2 flex min-h-[320px] flex-col justify-center rounded-[12px] bg-accent p-7 text-[#0c0d0f] md:order-2 md:col-span-8 md:h-[380px] md:p-12">
-          <h2 className="text-[clamp(32px,3.6vw,56px)] leading-[1] font-semibold tracking-[-0.035em]">La jornada, sin margen.</h2>
-          <p className="mt-4 max-w-[44ch] text-[17px] leading-[1.55]">LaLiga, Premier, Serie A, Bundesliga y Ligue 1, con datos de esta misma semana. Sin dinero real: solo análisis.</p>
+          <h2 className={H2}>La jornada, sin margen.</h2>
+          <p className="mt-4 max-w-[44ch] text-[20px] leading-[1.55]">LaLiga, Premier, Serie A, Bundesliga y Ligue 1, con datos de esta misma semana. Sin dinero real: solo análisis.</p>
           <div className="mt-8"><Button to="/hoy" tone="ink">Abrir la app</Button></div>
         </Rise>
         <Rise i={2} className="relative order-3 h-[140px] overflow-hidden rounded-[12px] md:col-span-2 md:-mr-6 md:h-[380px]">
@@ -514,8 +502,8 @@ function Closing() {
 function Footer() {
   return (
     <footer className={cx('bg-bg pt-[24svh] pb-8', PAD)}>
-      <div className={cx(WRAP, 'grid gap-2 text-[14px] md:grid-cols-[1fr_auto_1fr] md:items-baseline md:gap-6')}>
-        <span className="text-muted">Halfline · Trabajo de Fin de Grado</span>
+      <div className={cx(WRAP, 'grid gap-2 text-[16px] md:grid-cols-[1fr_auto_1fr] md:items-baseline md:gap-6')}>
+        <span className="text-muted">Halfline · Probabilidades 1X2 frente al mercado</span>
         <nav className="flex flex-wrap gap-6">
           <Link to="/hoy" className="hover:text-accent">Hoy</Link>
           <Link to="/modelo" className="hover:text-accent">Modelo</Link>
@@ -523,7 +511,7 @@ function Footer() {
         </nav>
         <span className="text-muted md:text-right">{new Date().getFullYear()} · Sin dinero real</span>
       </div>
-      <p className={cx(WRAP, 'mt-6 text-[13px] leading-[1.5] text-muted')}><span className="block max-w-[75ch]">
+      <p className={cx(WRAP, 'mt-6 text-[13px] leading-[1.5] text-muted')}><span className="block max-w-[60ch]">
         Fotografías: «Interior of a football stadium at night» de Jeff Chi (CC0, WordPress Photo Directory); «Turf soccer pitch illuminated floodlights» (CC0, rawpixel).</span>
       </p>
     </footer>

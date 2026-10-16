@@ -201,7 +201,7 @@ function Calendar({ data }: { data: Upcoming[] }) {
         />
       </div>
       {/* Tira de días: cada uno con su número de partidos */}
-      <div className="no-scrollbar mt-4 flex gap-1.5 overflow-x-auto px-5 pb-3" role="tablist" aria-label="Día">
+      <div className="mt-4 flex flex-wrap gap-1.5 px-5 pb-3" role="tablist" aria-label="Día">
         {days.map(([k, ms]) => {
           const on = active?.[0] === k
           return (

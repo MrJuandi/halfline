@@ -6,7 +6,7 @@ import { useCrumbs } from '../components/shell'
 import { TeamStyleCard } from '../components/stylemap'
 import { Finishing, ImpactChart, PlayerCard, SeasonShots, SquadTable, StyleProfile, TypicalXI } from '../components/team'
 import { cx, ErrorState, FormSquares, Panel, PanelHeader, Select, Skeleton, Stagger, StaggerItem, Stat, Tabs, TeamBadge } from '../components/ui'
-import { analysisUrl, api, prefetch, teamColor, useApi, type LeagueCode, type Styles as StylesData, type TeamAnalysis, type TeamPage, teamName as tn } from '../lib/api'
+import { analysisUrl, api, prefetch, useApi, type LeagueCode, type Styles as StylesData, type TeamAnalysis, type TeamPage, teamName as tn } from '../lib/api'
 import { day, LEAGUES, num, seasonLabel, signed } from '../lib/format'
 
 export default function Team() {
@@ -55,15 +55,13 @@ export default function Team() {
   const eloNow = series.elo.at(-1)?.elo ?? null
   const eloStart = series.elo.find((p) => new Date(p.kickoff).getFullYear() >= t.season)?.elo ?? null
 
-  const color = teamColor(t.team) ?? 'var(--accent)'
   return (
     <>
       <h1 className="sr-only">{tn(t.team)}</h1>
       <Stagger className="mb-6 flex flex-col gap-3">
         <StaggerItem>
-          <Panel className="overflow-hidden">
-            <div className="h-1.5" style={{ background: color }} />
-            <div className="flex flex-wrap items-center gap-5 px-5 py-6 md:px-7">
+          <div>
+            <div className="flex flex-wrap items-center gap-5 py-2">
               <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}>
                 <TeamBadge team={t.team} size={72} />
               </motion.div>
@@ -85,7 +83,7 @@ export default function Team() {
                 />
               )}
             </div>
-          </Panel>
+          </div>
         </StaggerItem>
         <StaggerItem className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
           <Stat label="Puntos" value={s.pts} sub={`${s.played} partidos · ${num(s.pts / Math.max(s.played, 1))} por partido`} />
