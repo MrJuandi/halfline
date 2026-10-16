@@ -1,31 +1,56 @@
-# Predicción 1X2 en fútbol con Machine Learning
+<p align="center">
+  <img src="web/public/favicon.svg" width="64" alt="Halfline">
+</p>
 
-TFG sobre modelos de machine learning que estiman, antes de cada partido, la probabilidad de **victoria local, empate y victoria visitante**. El trabajo estudia si esas probabilidades son fiables y las compara con las del mercado de apuestas.
+<h1 align="center">Halfline</h1>
 
-## Motivación
+<p align="center"><b>Quita el margen. Mira el partido.</b><br>
+Probabilidades 1X2 de fútbol con machine learning, comparadas con las casas de apuestas y Polymarket.</p>
 
-El fútbol es difícil de predecir: hay pocos goles, mucho azar y muchos empates. Queremos saber hasta dónde llega el ML con datos públicos y qué distancia hay con las casas de apuestas.
+---
 
-## Objetivo
+Trabajo de Fin de Grado. Halfline estima, antes de cada partido de las cinco grandes ligas europeas, la probabilidad de **victoria local, empate y victoria visitante**. Después le quita a las cuotas el margen que cobran las casas y compara lo que queda con un modelo propio y con Polymarket.
 
-Una aplicación web que muestre las probabilidades 1X2 de cada partido, cómo de fiables son y cómo se comparan con el mercado.
+El nombre viene de la *halfway line*, la línea de medio campo. Es el punto justo entre local y visitante, y también la *line* de las apuestas.
 
-## Datos
+## Qué hay dentro
 
-- Resultados y estadísticas de partidos de las 5 grandes ligas europeas
-- Cuotas de casas de apuestas y precios de Polymarket
-- Fuente principal: [Football-Data.co.uk](https://www.football-data.co.uk/data.php)
-
-## Modelo
-
-Clasificación en tres clases (1, X, 2) con **Gradient Boosting**. Se compara con modelos más simples (Elo, Poisson, regresión logística) y con el mercado. Después se calibran las probabilidades.
+| Carpeta | Contenido |
+|---|---|
+| `futdata/` | Descarga y limpieza de datos (Football-Data, Understat, ESPN, Transfermarkt, Polymarket), variables, modelos y la API Flask |
+| `futdata/models/` | Elo, Poisson y goles, quitar el margen, sesgos del mercado, evaluación y comparación con Polymarket |
+| `web/` | Aplicación React + TypeScript + Vite |
+| `docs/` | Notas de datos, modelos, sesgos del mercado y diseño |
+| `tests/` | Tests con pytest |
 
 ## Pipeline
 
 ```
-Datos → Limpieza → Variables → Modelo ML → Evaluación → App
+Datos → Limpieza → Variables → Modelo → Quitar margen → Evaluación → App
 ```
+
+## Arrancar en local
+
+```bash
+pip install -r requirements.txt
+npm install --prefix web
+./scripts/dev.sh        # API en :8000 y web en http://localhost:5173
+```
+
+Los datos (`data/`) no están en el repositorio por su tamaño. Se regeneran con `python -m futdata download`. La clave de PitchAPI va en `.env` como `PITCHAPI_KEY`.
+
+## Identidad
+
+| Rol | Oscuro | Claro |
+|---|---|---|
+| Fondo | `#0c0d0f` | `#f3f3f1` |
+| Acento (ventaja, modelo) | `#4cc38a` | `#18794e` |
+| Local | `#5b9bf0` | `#2563c9` |
+| Empate | `#8e9096` | `#7a7c83` |
+| Visitante | `#e5a54b` | `#b7741a` |
+
+Tipografía: Geist. Logo: círculo central cortado por la línea de medio campo.
 
 ## Tecnologías
 
-Python · pandas · numpy · scikit-learn · matplotlib
+Python · pandas · numpy · scikit-learn · scipy · Flask · React · TypeScript · Vite · Tailwind · d3

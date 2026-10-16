@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+
+# Datos y secretos (no se publican)
+data/
+.env
+
+# Frontend
+web/node_modules/
+web/dist/
+
+# Herramientas locales
+.DS_Store
+.taste-skill/
+.claude/worktrees/
+.claude/settings.local.json
+.claude/skills/
