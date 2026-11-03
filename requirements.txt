@@ -7,3 +7,5 @@ joblib>=1.5
 flask>=3.0
 pillow>=10.3
 pytest>=8
+websockets>=13
+psutil>=5.9
