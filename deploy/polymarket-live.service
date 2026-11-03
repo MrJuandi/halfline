@@ -1,0 +1,15 @@
+[Unit]
+Description=Halfline: colector de order book de Polymarket
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=halfline
+WorkingDirectory=/opt/halfline
+EnvironmentFile=/etc/halfline.env
+ExecStart=/opt/halfline/.venv/bin/python -m futdata.polymarket_live
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
