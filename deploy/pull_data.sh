@@ -12,9 +12,9 @@ DEST="$(cd "$(dirname "$0")/.." && pwd)/data/raw/polymarket_live"
 mkdir -p "$DEST/ws" "$DEST/meta"
 
 if [ "$HOST" = local ]; then
-  remote() { bash -c "$1"; }; SRC="$REMOTE_DIR"
+  remote() { bash -c "$1"; }; SRC="$REMOTE_DIR"; SUDO=""
 else
-  remote() { ssh "$HOST" "$1"; }; SRC="$HOST:$REMOTE_DIR"
+  remote() { ssh "$HOST" "$1"; }; SRC="$HOST:$REMOTE_DIR"; SUDO="sudo"  # los ficheros son del usuario del servicio
 fi
 
 # catálogo: se copia sin borrar (el fichero del día sigue creciendo)
@@ -33,5 +33,5 @@ remote "cd $REMOTE_DIR/ws && xargs sha256sum --" < "$LIST" | sort > "$LIST.remot
 (cd "$DEST/ws" && xargs shasum -a 256 -- < "$LIST") | sort > "$LIST.local"
 cmp -s "$LIST.remote" "$LIST.local" || { echo "ERROR: los hashes no coinciden, no se borra nada"; exit 1; }
 
-remote "cd $REMOTE_DIR/ws && xargs rm -f --" < "$LIST"
+remote "cd $REMOTE_DIR/ws && xargs $SUDO rm -f --" < "$LIST"
 echo "OK: $(wc -l < "$LIST" | tr -d ' ') ficheros descargados, verificados y borrados de la VM."
