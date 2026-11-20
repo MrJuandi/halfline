@@ -1,6 +1,7 @@
-import gzip
 import json
 from datetime import datetime, timedelta, timezone
+
+import zstandard
 
 from futdata import monitor, polymarket_live as live
 
@@ -40,7 +41,8 @@ def test_recorder_escribe_y_comprime_horas_cerradas(tmp_path, monkeypatch):
     old.parent.mkdir(parents=True)
     old.write_text("1\t{}\n")
     assert rec.compress_closed() == 1
-    assert not old.exists() and gzip.open(f"{old}.gz", "rt").read() == "1\t{}\n"
+    assert not old.exists() and zstandard.ZstdDecompressor().decompressobj().decompress(
+        open(f"{old}.zst", "rb").read()) == b"1\t{}\n"
     current = next(tmp_path.glob("ws/*/*.jsonl"))
     ts, raw = current.read_text().rstrip("\n").split("\t", 1)
     assert ts.isdigit() and json.loads(raw) == {"event_type": "book"}

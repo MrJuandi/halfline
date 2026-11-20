@@ -1,0 +1,12 @@
+[Unit]
+Description=Halfline: sube al bucket las horas cerradas del colector y las borra de la VM
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=halfline
+EnvironmentFile=/etc/halfline.env
+ExecStart=/bin/bash /opt/halfline/deploy/push_bucket.sh
+Nice=10
+IOSchedulingClass=idle

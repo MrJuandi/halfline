@@ -6,24 +6,24 @@ La API no guarda el libro histórico, así que hay que capturarlo mientras ocurr
     (book, price_change, last_trade_price, tick_size_change).
 
 Destino (cada línea del ws es "<ms de recepción>\\t<mensaje tal cual>"):
-  data/raw/polymarket_live/ws/AAAA-MM-DD/HH.jsonl[.gz]   mensajes del websocket (UTC, .gz al cerrar la hora)
+  data/raw/polymarket_live/ws/AAAA-MM-DD/HH.jsonl[.zst]  mensajes del websocket (UTC, zstd al cerrar la hora)
   data/raw/polymarket_live/meta/AAAA-MM-DD.jsonl         catálogo: token -> liga, evento, mercado, resultado
 
 Uso: python -m futdata.polymarket_live            (Ctrl+C para parar)
 Avisos de RAM, disco y parada por ntfy: ver futdata/monitor.py.
+Las horas cerradas se suben al bucket y se borran de la VM: ver deploy/push_bucket.sh.
 """
 from __future__ import annotations
 
 import asyncio
-import gzip
 import json
 import os
-import shutil
 import time
 from datetime import datetime, timedelta, timezone
 
 import requests
 import websockets
+import zstandard
 
 from futdata import monitor
 from futdata.common import RAW, USER_AGENT, log
@@ -37,6 +37,7 @@ PING_EVERY = 10  # s
 LOG_EVERY = 60  # s
 HORIZON = timedelta(days=10)  # cuánto antes del partido empezamos a grabar
 GRACE = timedelta(hours=5)  # cuánto después del inicio seguimos (partido + prórroga)
+ZSTD_LEVEL = 10  # ~37 % menos que gzip -6 en estos mensajes, asumible para la CPU de una e2-small
 
 
 def _parse(text: str) -> datetime | None:
@@ -104,9 +105,9 @@ class Recorder:
         for path in sorted((OUT / "ws").glob("*/*.jsonl")):
             if path == current:
                 continue
-            with open(path, "rb") as src, gzip.open(f"{path}.gz.tmp", "wb", compresslevel=6) as dst:
-                shutil.copyfileobj(src, dst)
-            os.replace(f"{path}.gz.tmp", f"{path}.gz")
+            with open(path, "rb") as src, open(f"{path}.zst.tmp", "wb") as dst:
+                zstandard.ZstdCompressor(level=ZSTD_LEVEL).copy_stream(src, dst)
+            os.replace(f"{path}.zst.tmp", f"{path}.zst")
             path.unlink()
             done += 1
         return done
