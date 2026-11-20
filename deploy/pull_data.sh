@@ -1,37 +1,24 @@
 #!/usr/bin/env bash
-# Baja a local el catálogo y las horas cerradas (.gz) y borra de la VM solo lo que ha quedado verificado.
-# Orden: listar -> copiar -> gzip -t en local -> comparar sha256 local/remoto -> borrar en la VM esos mismos ficheros.
-# Si cualquier paso falla, no se borra nada. Es seguro repetirlo o interrumpirlo en cualquier momento.
-# Requiere haber ejecutado antes: gcloud compute config-ssh
-# Uso: HOST=halfline-collector.<zona>.<proyecto> bash deploy/pull_data.sh
-#      HOST=local REMOTE_DIR=<ruta> bash deploy/pull_data.sh   (prueba sin VM)
+# Baja a local datos del colector desde el bucket. No borra nada ni en el bucket ni en la VM.
+# La VM sube sola las horas cerradas (deploy/push_bucket.sh), así que aquí solo se baja lo que haga falta.
+# El bucket es Coldline: leer cuesta ~0,02 $/GB más la salida a internet (~0,12 $/GB). Baja solo lo necesario.
+# Uso: bash deploy/pull_data.sh                 solo el catálogo (meta/)
+#      bash deploy/pull_data.sh 2026-11-20 ...  además esos días de ws/
+#      bash deploy/pull_data.sh --size          cuánto ocupa cada día en el bucket
 set -euo pipefail
-: "${HOST:?define HOST, p. ej. halfline-collector.europe-west1-b.mi-proyecto}"
-REMOTE_DIR="${REMOTE_DIR:-/opt/halfline/data/raw/polymarket_live}"
+BUCKET="${BUCKET:-gs://halfline-6787-polymarket-live}"
+# gcloud storage lanza subprocesos con el python que lo ejecuta; con el de Anaconda se cuelgan (falta google.auth).
+for py in "${CLOUDSDK_PYTHON:-}" /opt/homebrew/bin/python3 /usr/local/bin/python3; do
+  [ -x "$py" ] && { export CLOUDSDK_PYTHON="$py"; break; }
+done
 DEST="$(cd "$(dirname "$0")/.." && pwd)/data/raw/polymarket_live"
-mkdir -p "$DEST/ws" "$DEST/meta"
 
-if [ "$HOST" = local ]; then
-  remote() { bash -c "$1"; }; SRC="$REMOTE_DIR"; SUDO=""
-else
-  remote() { ssh "$HOST" "$1"; }; SRC="$HOST:$REMOTE_DIR"; SUDO="sudo"  # los ficheros son del usuario del servicio
-fi
+if [ "${1:-}" = --size ]; then gcloud storage du -s "$BUCKET/ws/*" | sort -k2; exit 0; fi
 
-# catálogo: se copia sin borrar (el fichero del día sigue creciendo)
-rsync -a "$SRC/meta/" "$DEST/meta/"
-
-LIST="$(mktemp)"; trap 'rm -f "$LIST" "$LIST.remote" "$LIST.local"' EXIT
-remote "cd $REMOTE_DIR/ws 2>/dev/null && find . -name '*.gz' | sed 's|^\./||' | sort" > "$LIST"
-if [ ! -s "$LIST" ]; then echo "No hay horas cerradas que bajar."; exit 0; fi
-echo "$(wc -l < "$LIST" | tr -d ' ') ficheros en la VM"
-
-rsync -a --files-from="$LIST" "$SRC/ws/" "$DEST/ws/"
-
-(cd "$DEST/ws" && while read -r f; do gzip -t "$f"; done < "$LIST") || { echo "ERROR: gzip corrupto, no se borra nada"; exit 1; }
-
-remote "cd $REMOTE_DIR/ws && xargs sha256sum --" < "$LIST" | sort > "$LIST.remote"
-(cd "$DEST/ws" && xargs shasum -a 256 -- < "$LIST") | sort > "$LIST.local"
-cmp -s "$LIST.remote" "$LIST.local" || { echo "ERROR: los hashes no coinciden, no se borra nada"; exit 1; }
-
-remote "cd $REMOTE_DIR/ws && xargs $SUDO rm -f --" < "$LIST"
-echo "OK: $(wc -l < "$LIST" | tr -d ' ') ficheros descargados, verificados y borrados de la VM."
+mkdir -p "$DEST/meta" "$DEST/ws"
+gcloud storage rsync "$BUCKET/meta" "$DEST/meta"
+for day in "$@"; do
+  mkdir -p "$DEST/ws/$day"
+  gcloud storage rsync "$BUCKET/ws/$day" "$DEST/ws/$day"
+done
+echo "OK: datos en $DEST"

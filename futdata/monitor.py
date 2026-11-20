@@ -53,7 +53,7 @@ def problems(data_dir: Path, last_message: float | None, now: float) -> dict[str
     if pct >= DISK_WARN[0]:
         urgent = pct >= DISK_WARN[1]
         found["disk"] = (f"Disco al {pct:.0f}% ({disk.free / 1e9:.1f} GB libres, datos {dir_size_gb(data_dir):.1f} GB). "
-                         "Descarga y borra.", "urgent" if urgent else "high")
+                         "Revisa la subida al bucket (halfline-push.timer).", "urgent" if urgent else "high")
     if last_message is not None and now - last_message > STALL_AFTER:
         found["stall"] = (f"Sin mensajes del websocket desde hace {(now - last_message) / 60:.0f} min", "high")
     return found

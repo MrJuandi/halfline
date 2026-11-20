@@ -1,0 +1,9 @@
+[Unit]
+Description=Halfline: subida al bucket cada hora
+
+[Timer]
+OnCalendar=*-*-* *:20:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
