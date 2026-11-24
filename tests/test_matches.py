@@ -43,3 +43,36 @@ def test_attach_joins_every_match_with_matching_score():
     out = attach(FD, OTHER, learn_names(FD, OTHER, "x"), "x_id")
     assert list(out["x_id"]) == ["a", "b", "c", "d", "e", "f"]
     assert out["x_id_score_ok"].all()
+
+
+def _promoted(n_matches: int, rivals: list[tuple[str, int]]):
+    """`Hull` juega n_matches; en cada fecha otros partidos de FD coinciden en marcador (rivals: equipo, veces)."""
+    fd, other, days = [], [], pd.date_range("2026-08-15", periods=n_matches, freq="7D")
+    noise = [t for t, k in rivals for _ in range(k)]
+    for i, d in enumerate(days):
+        fd.append(("E0", 2026, d, "Hull", f"R{i % 3}", 1, 0))
+        other.append(("E0", 2026, d, "Hull City", f"R{i % 3}", 1, 0, f"h{i}"))
+    for i, team in enumerate(noise):
+        fd.append(("E0", 2026, days[i % n_matches], team, f"S{i}", 1, 0))
+    return _frame(fd), _frame(other, "x_id")
+
+
+def test_promoted_team_accepted_when_coincidences_are_spread():
+    """Caso real (nov. 2026): 11 votos de 19 (57,9 %), pero el segundo candidato solo tiene 2."""
+    fd, other = _promoted(11, [("A", 2)] + [(f"N{i}", 1) for i in range(6)])
+    row = learn_names(fd, other, "x").set_index("name").loc["Hull City"]
+    assert (row.canonical, row.votes, row.share) == ("Hull", 11, 0.579)
+    assert row.accepted
+    assert attach(fd, other, learn_names(fd, other, "x"), "x_id")["x_id"].notna().sum() == 11
+
+
+def test_name_rejected_and_logged_when_second_candidate_competes(caplog):
+    fd, other = _promoted(5, [("A", 3)])
+    row = learn_names(fd, other, "x").set_index("name").loc["Hull City"]
+    assert not row.accepted
+    assert "nombres rechazados" in caplog.text
+
+
+def test_name_rejected_with_too_few_votes():
+    fd, other = _promoted(2, [])
+    assert not learn_names(fd, other, "x").set_index("name").loc["Hull City", "accepted"]
