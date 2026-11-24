@@ -12,8 +12,14 @@
   <img alt="Python" src="https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white">
   <img alt="React" src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-pytest-0A9EDC?logo=pytest&logoColor=white">
+  <a href="https://github.com/MrJuandi/halfline/actions/workflows/tests.yml"><img alt="Tests" src="https://github.com/MrJuandi/halfline/actions/workflows/tests.yml/badge.svg"></a>
 </p>
+
+<p align="center">
+  <img src="docs/assets/app.jpg" width="800" alt="Halfline matchday view with model probabilities">
+</p>
+
+<p align="center"><a href="https://juandiegodiaz.vercel.app/work/halfline">Case study and demo</a></p>
 
 ---
 
