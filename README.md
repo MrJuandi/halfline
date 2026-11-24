@@ -5,7 +5,7 @@
 <h1 align="center">Halfline</h1>
 
 <p align="center">
-  Probabilidades 1X2 para las cinco grandes ligas europeas, comparadas con las casas de apuestas y Polymarket.
+  1X2 probabilities for Europe’s top five football leagues, compared with bookmakers and Polymarket.
 </p>
 
 <p align="center">
@@ -17,76 +17,78 @@
 
 ---
 
-Halfline calcula antes de cada partido la probabilidad de victoria local, empate y victoria visitante. Quita el margen de las cuotas para sacar la probabilidad implícita del mercado y la compara con modelos propios: Elo ajustado por xG, Dixon-Coles y metamodelos. Todo se evalúa fuera de muestra.
+Before each match, Halfline estimates the probability of a home win, a draw and an away win. It removes the margin from the odds to get the probability implied by the market, and compares it with its own models: xG-adjusted Elo, Dixon-Coles and meta-models. Everything is evaluated out of sample.
 
-## Funcionalidades
+The app interface and the technical notes in `docs/` are in Spanish.
 
-- **Jornada:** próximos partidos con la probabilidad del modelo frente a la del mercado sin margen.
-- **Ficha de partido:** mapa de tiros con xG, carrera de xG, momentum, alineaciones, mapas de calor y estadísticas avanzadas.
-- **Ligas y equipos:** clasificación con goles esperados (xG) y puntos esperados (xPts), forma reciente, Elo y rendimiento subyacente.
-- **Jugadores y estilos:** perfiles por rol con percentiles por 90 minutos, jugadores similares y mapa de estilos de juego.
-- **Evaluación del modelo:** log-loss, Brier y RPS por liga, calibración y retorno simulado con intervalos de confianza.
-- **Mercados:** margen de cada casa, sesgos del mercado y comparación con Polymarket.
+## Features
 
-## Resultados
+- **Matchday:** upcoming matches with the model's probability next to the margin-free market probability.
+- **Match sheet:** shot map with xG, xG race, momentum, line-ups, heat maps and advanced statistics.
+- **Leagues and teams:** table with expected goals (xG) and expected points (xPts), recent form, Elo and underlying performance.
+- **Players and styles:** role profiles with per-90 percentiles, similar players and a playing-style map.
+- **Model evaluation:** log-loss, Brier and RPS by league, calibration and simulated returns with confidence intervals.
+- **Markets:** each bookmaker's margin, market biases and a comparison with Polymarket.
 
-Test fuera de muestra: temporadas 2025/26 y 2026/27, 2.049 partidos. Menos es mejor.
+## Results
 
-| Modelo | Log-loss |
+Out-of-sample test: 2025/26 and 2026/27 seasons, 2,049 matches. Lower is better.
+
+| Model | Log-loss |
 |---|---|
-| Mercado de cierre (sin margen) | 0,975 |
-| Mercado pre-cierre (sin margen) | 0,976 |
-| Elo ajustado por xG | 0,993 |
-| Frecuencias históricas | 1,071 |
+| Closing market (margin removed) | 0.975 |
+| Pre-closing market (margin removed) | 0.976 |
+| xG-adjusted Elo | 0.993 |
+| Historical frequencies | 1.071 |
 
-El detalle está en [`docs/modelos.md`](docs/modelos.md) y [`docs/sesgos_mercado.md`](docs/sesgos_mercado.md).
+The market is still ahead of the models. Details are in [`docs/modelos.md`](docs/modelos.md) and [`docs/sesgos_mercado.md`](docs/sesgos_mercado.md) (Spanish).
 
-## Arquitectura
+## Architecture
 
 ```
-futdata/             Ingesta, limpieza, variables, modelos y API
-├── football_data    Resultados y cuotas de cierre
-├── espn             Estadísticas, alineaciones y calendario
-├── understat        xG por partido
-├── pitchapi         Tiros con coordenadas, momentum y mapas de calor
-├── transfermarkt    Valores de mercado de las plantillas
-├── polymarket       Precios del mercado de predicción
-├── features         Variables previas al partido, sin fuga de información
-├── models/          Elo, goles, eliminación de margen, evaluación y sesgos
-└── api              API Flask de solo lectura
-web/                 Frontend en React + TypeScript + Vite
-tests/               Tests con pytest
-docs/                Notas técnicas de datos, modelos y diseño
+futdata/             Ingestion, cleaning, features, models and API
+├── football_data    Results and closing odds
+├── espn             Statistics, line-ups and fixtures
+├── understat        xG per match
+├── pitchapi         Shots with coordinates, momentum and heat maps
+├── transfermarkt    Squad market values
+├── polymarket       Prediction-market prices
+├── features         Pre-match features, without information leakage
+├── models/          Elo, goals, margin removal, evaluation and biases
+└── api              Read-only Flask API
+web/                 React + TypeScript + Vite frontend
+tests/               pytest tests
+docs/                Technical notes on data, models and design
 ```
 
-## Puesta en marcha
+## Getting started
 
-Requisitos: Python 3.12 o superior y Node 22 o superior.
+Requirements: Python 3.12 or later and Node 22 or later.
 
 ```bash
 pip install -r requirements.txt
 npm install --prefix web
 ```
 
-Datos (no se versionan):
+Data (not versioned):
 
 ```bash
-python -m futdata download          # fuentes crudas: football_data, espn, understat, transfermarkt, pitchapi
-python -m futdata.polymarket        # precios de Polymarket
-python -m futdata.features          # tabla de variables
-python -m futdata.models.evaluate   # entrenamiento y evaluación
+python -m futdata download          # raw sources: football_data, espn, understat, transfermarkt, pitchapi
+python -m futdata.polymarket        # Polymarket prices
+python -m futdata.features          # feature table
+python -m futdata.models.evaluate   # training and evaluation
 ```
 
-PitchAPI necesita una clave en `.env`:
+PitchAPI needs a key in `.env`:
 
 ```bash
-PITCHAPI_KEY=tu_clave
+PITCHAPI_KEY=your_key
 ```
 
-Desarrollo:
+Development:
 
 ```bash
-./scripts/dev.sh                    # API en :8000 y web en http://localhost:5173
+./scripts/dev.sh                    # API on :8000 and web on http://localhost:5173
 ```
 
 Tests:
@@ -97,15 +99,15 @@ python -m pytest
 
 ## API
 
-| Endpoint | Descripción |
+| Endpoint | Description |
 |---|---|
-| `GET /api/meta` | Cobertura y fecha de los datos |
-| `GET /api/upcoming?days=` | Próximos partidos con probabilidades |
-| `GET /api/matches?league=&season=&team=&limit=` | Partidos jugados |
-| `GET /api/matches/<match_id>` | Ficha completa de un partido |
-| `GET /api/leagues/<league>/table?season=` | Clasificación con xG y xPts |
-| `GET /api/teams/<league>/<team>?season=` | Página de equipo |
-| `GET /api/teams` | Equipos disponibles |
+| `GET /api/meta` | Data coverage and date |
+| `GET /api/upcoming?days=` | Upcoming matches with probabilities |
+| `GET /api/matches?league=&season=&team=&limit=` | Played matches |
+| `GET /api/matches/<match_id>` | Full match sheet |
+| `GET /api/leagues/<league>/table?season=` | Table with xG and xPts |
+| `GET /api/teams/<league>/<team>?season=` | Team page |
+| `GET /api/teams` | Available teams |
 
 ## Stack
 
