@@ -4,8 +4,10 @@ Football-Data es la referencia: sus nombres de equipo son los canónicos y cada 
 partido. Los nombres de ESPN y PitchAPI se traducen con un diccionario que se aprende de los
 propios partidos: en cada liga y temporada, un partido de la otra fuente con la misma fecha
 (±1 día) y el mismo marcador que uno de Football-Data vota por "su local = local de FD" y
-"su visitante = visitante de FD". Cada nombre se asigna al canónico con mayoría clara, o con
-al menos MIN_VOTES votos si el nombre es idéntico (equipos recién ascendidos, con pocos partidos).
+"su visitante = visitante de FD". Cada nombre se asigna al canónico más votado si tiene al menos
+MIN_VOTES votos y MIN_LEAD veces los del segundo (o si el nombre es idéntico). Se compara con el
+segundo y no con el total porque las coincidencias de marcador reparten votos sueltos entre muchos
+equipos: un recién ascendido puede bajar del 60 % del total sin que ningún otro candidato compita.
 
 Salidas:
   data/processed/matches.parquet   un partido por fila con los ids de cada fuente
@@ -26,7 +28,7 @@ from futdata.common import FIRST_SEASON, LEAGUES, RAW, ROOT, fd_code, log, seaso
 PROCESSED = ROOT / "data" / "processed"
 MAX_DAYS = 1          # diferencia máxima de fecha entre fuentes (husos horarios, fechas locales)
 MIN_VOTES = 3         # votos mínimos para aceptar un nombre
-MIN_SHARE = 0.6       # proporción mínima de votos del nombre ganador
+MIN_LEAD = 3          # veces que el nombre ganador debe superar en votos al segundo
 
 
 # ---------------------------------------------------------------- carga por fuente
@@ -102,12 +104,16 @@ def learn_names(fd: pd.DataFrame, other: pd.DataFrame, source: str) -> pd.DataFr
         votes[(row.league, row.away_o)][row.away_fd] += 1
     out = []
     for (league, name), counter in votes.items():
-        best, n = counter.most_common(1)[0]
+        (best, n), *rest = counter.most_common(2)
+        second = rest[0][1] if rest else 0
         total = sum(counter.values())
         out.append({"source": source, "league": league, "name": name, "canonical": best,
                     "votes": n, "share": round(n / total, 3),
-                    "accepted": n >= MIN_VOTES and (n / total >= MIN_SHARE or name == best)})
+                    "accepted": n >= MIN_VOTES and (n >= MIN_LEAD * second or name == best)})
     names = pd.DataFrame(out)
+    rejected = names[~names.accepted]
+    if len(rejected):  # sus partidos se quedan sin id de esta fuente (sin xG ni ficha)
+        log.warning("%s: nombres rechazados:\n%s", source, rejected)
     # Un nombre canónico no puede recibir dos nombres distintos de la misma fuente y liga.
     dup = names[names.accepted].duplicated(["league", "canonical"], keep=False)
     if dup.any():

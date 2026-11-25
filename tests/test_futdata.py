@@ -178,3 +178,24 @@ def test_understat_success_resets_failure_counter(tmp_path, monkeypatch):
     # El éxito en la llamada 5 reinicia el contador: el aborto llega 5 fallos después (llamada 10)
     assert len(calls) == 10
     assert stats["aborted"] is True
+
+
+def test_understat_aborts_at_once_on_maintenance_page(tmp_path, monkeypatch):
+    monkeypatch.setattr(understat, "OUT", tmp_path)
+    monkeypatch.setattr(understat, "Client", FakeClient)
+    calls = []
+    page = b"<html><body><div>We will come back soon</div></body></html>"
+
+    def maintenance(client, source, url, path, *, params=None, validate=None):
+        calls.append(url)
+        try:
+            validate(page)
+        except ValueError:
+            return False
+        return True
+
+    monkeypatch.setattr(understat, "fetch_to", maintenance)
+    stats = understat.download(first=2014, last=2026, leagues=["SP1"])
+    assert len(calls) == 1  # no agota los 5 intentos
+    assert stats["aborted"] is True
+    assert stats["error"] == 1

@@ -10,6 +10,10 @@ descargar en cada ejecución. Los partidos sólo se piden si isResult == True y 
 Si Understat cae, las peticiones fallan una tras otra. Tras MAX_CONSECUTIVE_FAILURES fallos
 seguidos (red, HTTP 4xx/5xx o respuesta no válida) se aborta la fuente y se devuelve
 stats["aborted"] = True. Un éxito reinicia el contador.
+
+Cuando Understat está en mantenimiento sirve la misma página HTML ("We will come back soon")
+con HTTP 200 en todas las rutas, también en las de datos. Si se detecta, se aborta en la
+primera petición con un mensaje claro en vez de agotar los fallos con errores de JSON.
 """
 from __future__ import annotations
 
@@ -24,10 +28,15 @@ BASE = "https://understat.com"
 OUT = RAW / SOURCE
 MAX_CONSECUTIVE_FAILURES = 5
 HEADERS = {"X-Requested-With": "XMLHttpRequest", "Referer": "https://understat.com/"}
+MAINTENANCE_MARKER = b"We will come back soon"
 
 
 class _Abort(Exception):
     """Se lanza al alcanzar MAX_CONSECUTIVE_FAILURES fallos seguidos."""
+
+
+class _Maintenance(Exception):
+    """Se lanza cuando Understat responde con su página de mantenimiento."""
 
 
 def _today() -> date:
@@ -72,8 +81,21 @@ def last_result_date(league_data: dict) -> str | None:
 
 
 def _get(client: Client, state: dict, stats: dict, url: str, path: Path, validate) -> bool:
-    """fetch_to con contador de fallos consecutivos. Lanza _Abort al llegar al límite."""
-    if fetch_to(client, SOURCE, url, path, validate=validate):
+    """fetch_to con contador de fallos consecutivos. Lanza _Abort al llegar al límite y
+    _Maintenance si la respuesta es la página de mantenimiento."""
+    seen = {"maintenance": False}
+
+    def checked(content: bytes) -> None:
+        if MAINTENANCE_MARKER in content:
+            seen["maintenance"] = True
+            raise ValueError("Understat está en mantenimiento (página 'We will come back soon')")
+        validate(content)
+
+    ok = fetch_to(client, SOURCE, url, path, validate=checked)
+    if seen["maintenance"]:
+        stats["error"] += 1
+        raise _Maintenance()
+    if ok:
         state["failures"] = 0
         stats["ok"] += 1
         return True
@@ -115,6 +137,9 @@ def download(first: int | None = None, last: int | None = None, leagues: list[st
     except _Abort:
         log.error("understat: abortado tras %d fallos consecutivos; se omite el resto de la fuente. "
                   "Reintentar más tarde.", MAX_CONSECUTIVE_FAILURES)
+        stats["aborted"] = True
+    except _Maintenance:
+        log.error("understat: el sitio está en mantenimiento; se omite la fuente. Reintentar más tarde.")
         stats["aborted"] = True
     log.info("understat: %s", stats)
     return stats
